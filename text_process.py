@@ -43,12 +43,15 @@ sys.setdefaultencoding('utf-8')
 
 # 处理成可读文本，并得到标题
 def text_clean(text):
+    # 去掉空行
+    text0 = text.replace('</p><p>&nbsp;', '')
+    text00 = text0.replace('</b></p><p><b>&nbsp;', '')
     # </p><p>代表要换行 插入换行转义符
-    text1 = text.replace('</p><p>', '</p>\n<p>')
+    text1 = text00.replace('</p><p>', '</p> ' + chr(10) + '<p>')
     # 生成正则编译器，用于删除括号中的内容
     dr = re.compile(r'<[^>]+>', re.S)
     # 用正则编译器删去括号内容，删去空格符号，得到处理过后的文字
-    processed_data = dr.sub('', text1).replace('&nbsp;', '\n')
+    processed_data = dr.sub('', text1).replace('&nbsp;', '')
     # 取前30个字符为标题
     title = processed_data[0:30]
     return title, processed_data
@@ -228,6 +231,7 @@ def get_summary_snowNLP():
             s = SnowNLP(row[1])
             id_list.append(row[0])
             try:
+                # limit表示摘要的句子数
                 summary_list.append(s.summary(limit=1)[0])
             # 如果标题没有意义，summary()方法会返回空，我们在这里用无意义标题代替
             except:
@@ -273,8 +277,32 @@ def get_motion_snowNLP():
     df1.to_sql('xq_motion', engine, index=False, if_exists='append')
 
 
+def write_processed_text():
+    id_list = []
+    processed_text_list = []
+    title_list = []
+    engine = create_engine(
+        """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
+        /dev1""")
+    sql = """select id,text from xq_value_processed_text"""
+    # 得到文本的df
+    rows = pd.read_sql(sql=sql, con=engine)
+    # index是df的index  row是一行文本信息的list
+    # row[0]是id，row[1]是文本内容
+    for index, row in rows.iterrows():
+        print(row[0])
+        t = text_clean(row[1])
+        # 写入list
+        id_list.append(row[0])
+        processed_text_list.append(t[1])
+        title_list.append(t[0])
+        print("done!")
+    # 生成df
+    df = pd.DataFrame({'id': id_list, 'title': title_list, 'processed_text': processed_text_list})
+    # print(df)
+    # 数据库生成表, 如果已经存在就插入行
+    df.to_sql('xq_value_processed_text_copy1', engine, index=False, if_exists='append')
+
+
 if __name__ == "__main__":
-    # print(get_tf_idf_list())
-    # print(get_sentence_list())
-    get_summary_snowNLP()
-    # get_keywords()
+    write_processed_text()
