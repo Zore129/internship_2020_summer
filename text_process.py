@@ -48,7 +48,7 @@ def text_clean(text):
     # 生成正则编译器，用于删除括号中的内容
     dr = re.compile(r'<[^>]+>', re.S)
     # 用正则编译器删去括号内容，删去空格符号，得到处理过后的文字
-    processed_data = dr.sub('', text1).replace('&nbsp;', '')
+    processed_data = dr.sub('', text1).replace('&nbsp;', '\n')
     # 取前30个字符为标题
     title = processed_data[0:30]
     return title, processed_data
