@@ -138,6 +138,11 @@ def get_keywords():
     最重要的是在anls.extract_tags(文本, 20, allowPOS=('n', 'a'), withFlag=True)
     语句中str类型文本的输入，怎么得到文本可以用其他的方法
     例如：用该方法直接传入text，anls.extract_tags(text, 20, allowPOS=('n', 'a'), withFlag=True)"""
+    jieba.load_userdict("finance.txt")
+    jieba.load_userdict("stock.txt")
+    jieba.load_userdict("company.txt")
+    jieba.load_userdict("psy.txt")
+    jieba.load_userdict("THUOCL_caijing")
     # 用于储存
     id_list = []
     word_list = []
@@ -147,7 +152,7 @@ def get_keywords():
     engine = create_engine(
         """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
         /dev1""")
-    sql = """select id,processed_text from xq_value_processed_text"""
+    sql = """select id,processed_text from xq_nlp"""
     # 得到文本的df
     rows = pd.read_sql(sql=sql, con=engine)
     # index是df的index  row是一行文本信息的list
@@ -157,7 +162,15 @@ def get_keywords():
         # 得到分词的数据
         # 最多20个词，只能是n、a词性，返回词性，如果想要tf-idf的weight 可以加上withWeight=True
         # 得到的数据类型为包里的特殊类型 w.word是分词 w.flag是词性 w.weight是tf-idf得分
-        tags_list = anls.extract_tags(str(row[1]), 20, allowPOS=('n', 'a'), withFlag=True)
+        tags_list = anls.extract_tags(str(row[1]), 20, allowPOS='n', withFlag=True)
+        # 写入list
+        for w in tags_list:
+            index_list.append(tags_list.index(w) + 1)
+            id_list.append(row[0])
+            word_list.append(w.word)
+            type_list.append(w.flag)
+        print("done!")
+        tags_list = anls.extract_tags(str(row[1]), 20, allowPOS='a', withFlag=True)
         # 写入list
         for w in tags_list:
             index_list.append(tags_list.index(w) + 1)
@@ -223,7 +236,7 @@ def get_summary_snowNLP():
     engine = create_engine(
         """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
         /dev1""")
-    sql = """select id,processed_text from xq_value_processed_text"""
+    sql = """select id,processed_text from xq_nlp"""
     rows = pd.read_sql(sql=sql, con=engine)
     for index, row in rows.iterrows():
         if row[1]:
@@ -305,4 +318,4 @@ def write_processed_text():
 
 
 if __name__ == "__main__":
-    write_processed_text()
+    get_keywords()
