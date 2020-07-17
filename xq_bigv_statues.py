@@ -121,22 +121,22 @@ def get_bigv_statuses_data(uid, df, timestamp):
 
     r = requests.get(url, headers=headers, cookies=cookies,
                      allow_redirects=False, timeout=None)
-    print r.status_code
-    print (r.headers)
+    print(r.status_code)
+    print(r.headers)
     dictstr = json.loads(r.text)
     maxPage = dictstr['maxPage']
     if maxPage != 0:
         for pagenum in range(maxPage):
             url = "https://xueqiu.com/v4/statuses/user_timeline.json?user_id={}&page={}".format(uid, pagenum + 1)
-            print url
+            print(url)
             r = requests.get(url, headers=headers, cookies=cookies,
                              allow_redirects=False, timeout=None)
             dic = json.loads(r.text)
-            time.sleep(random.random()*3)
+            time.sleep(random.random(1, 3))
             # print(dic)
             for k in dic['statuses']:
                 if int(k['created_at']) < timestamp:
-                    print int(k['created_at'])
+                    print(int(k['created_at']))
                     return df
                 df = write_row(df, k)
 
@@ -159,10 +159,41 @@ def get_uid():
 
 
 if __name__ == "__main__":
-    engine = create_engine(
-        """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
-        /dev1""")
-    df = pd.DataFrame()
-    for row in get_uid():
-        get_bigv_statuses_data(row[0], df, timestamp=1594742400000)
-    pd.io.sql.to_sql(df, 'xq_bigv_statuses', engine, index=False, if_exists='append')
+    # engine = create_engine(
+    #     """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
+    #     /dev1""")
+    # df = pd.DataFrame()
+    # for row in get_uid():
+    #     get_bigv_statuses_data(row[0], df, timestamp=1594742400000)
+    # pd.io.sql.to_sql(df, 'xq_bigv_statuses', engine, index=False, if_exists='append')
+
+    url = "https://xueqiu.com/"
+
+    headers_raw = b"""
+                Accept: */*
+                Accept-Encoding: gzip, deflate, br
+                Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+                Connection: keep-alive
+                Host: xueqiu.com
+                Referer: https://xueqiu.com/u/6344107619
+                Sec-Fetch-Dest: empty
+                Sec-Fetch-Mode: cors
+                Sec-Fetch-Site: same-origin
+                User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36
+                """
+    headers = headers_raw_to_dict(headers_raw)
+    cookies = {
+        'Cookie': 'device_id=24700f9f1986800ab4fcc880530dd0ed;'
+                  ' s=cj137q59ip;'
+                  ' __utmz=1.1592793568.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); '
+                  'bid=a14ed9b410aee955ba8ad6e90da6a7a1_kbpyznno; '
+                  '__utma=1.817981092.1592793568.1594089109.1594608858.9;'
+                  'aliyungf_tc=AQAAANG9cWmA3gIAxmMR2oZTY60bn1q/; '
+                  'snbim_minify=true; remember=1; xq_a_token=84f14d8d58bc742ddbdfb3443523553d63a8025b; '
+                  'xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9'
+                  '.eyJ1aWQiOjI3NjQ2MzUxNjIsImlzcyI6InVjIiwiZXhwIjoxNTk1MzkwNTM3LCJjdG0iOjE1OTQ5NTg2NDA2NjMsImNpZCI6ImQ5ZDBuNEFadXAifQ.Xy2Aie_k5diROfUqbs1CVmmXWG-U6HjiYvwX_edd5Ygensa5yPYcvp3WVgS8hqQ3jDcwwtVU6UTCwHGU0mIbNPfPEFzRk6SabKRhtfEblM2j0ldjlK54N5etVZ3MyDCaFphd_ylMnyVjrJJDEvN0PxPQ8UD4AJUuTu1J9ND6E4Y6fHkOt0c0JzQkCo8i7bcFU3ys6zRMM6tQNnpLuLGliqSDoA6fdHUj1lcBMr_VfhOnvemmhPM3v-hdT1rpY-sccTIT41IeBHhoDkpvLOOAwaxHOkldciAGdrnp7xta8OlwNZzbbZZaQma-4Hgbp2ZaPzp9G9dR6hIMTKqXnmczQQ; xqat=84f14d8d58bc742ddbdfb3443523553d63a8025b; xq_r_token=9b4d7ef924beea602bac78e7eb97363f6f5edbeb; xq_is_login=1; u=2764635162; Hm_lvt_1db88642e346389874251b5a1eded6e3=1594869365,1594881198,1594951757,1594968432; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1594968635; acw_tc=2760820e15949698335623055ecebfbe4c1c0be667f35eddd126a85454f9d2'}
+
+    r = requests.get(url, headers=headers, cookies=cookies,
+                     allow_redirects=False, timeout=None)
+    print(r.status_code)
+    print(r.headers)
