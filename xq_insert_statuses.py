@@ -1,4 +1,4 @@
-# coding=utf-8-sig
+# coding=utf-8
 """使用时调用main(up,down) up为最大id down为最小id 程序补全其间的所有帖子
 若不加参数 则默认为更新爬取
 """
@@ -74,10 +74,10 @@ def catch_data(url, headers_raw, cookies):
 
     if r.cookies.get_dict():
         s.cookies.update(r.cookies)
-    row = r.json()['home_timeline'][0]
+    rows = r.json()['home_timeline']
     # time.sleep(random.randint(1, 2))
-    if row:
-        return row
+    if rows:
+        return rows
 
 
 def write_row(df, row):
@@ -215,11 +215,12 @@ def insert_value(up=0, down=0):
     try:
         while up1 > down1:
             url = get_next_url(up1)
-            row = catch_data(url, headers_raw, cookies)
-            if int(row['id']) > down1:
-                df = write_row(df, row)
-            up1 = int(row['id'])
-        # time.sleep(random.randint(600, 1200))
+            rows = catch_data(url, headers_raw, cookies)
+            time.sleep(random.random()*3)
+            for row in rows:
+                if int(row['id']) > down1:
+                    df = write_row(df, row)
+                up1 = int(row['id'])
 
     except Exception:
         logging.error("ERROR!!!", exc_info=True)
