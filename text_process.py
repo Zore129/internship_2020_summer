@@ -1,7 +1,6 @@
 # coding=utf-8
 import sys
 import csv
-import io
 import pandas as pd
 import re
 import jieba
@@ -14,31 +13,6 @@ from sqlalchemy import create_engine
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
-
-# f_id = pd.read_csv('xq_value.csv')
-# # # f_id.fillna('None', inplace=True)
-# # # # f = open('xq_processed_text.csv', 'w', encoding='utf-8-sig', newline='')
-# # # # csv_writer = csv.writer(f)
-# # # # csv_writer.writerow(['title', 'processed_text'])
-# # # text = f_id['text']
-# processed_text = []
-# title_list = []
-# for t in text:
-#     print(t)
-#     print('------------------------------------------')
-#     html = t.replace('</p><p>', '</p>\n<p>')
-#     dr = re.compile(r'<[^>]+>', re.S)
-#     dd = dr.sub('', html).replace('&nbsp;', '')
-# #     title = dd[0:30]
-#     processed_text.append(dd)
-#     title_list.append(title)
-#     print(title)
-#     print(dd)
-#     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-# f_id['processed_text'] = processed_text
-# f_id['title'] = title_list
-# f_id.to_csv('xq_value_processed_text')
 
 
 # 处理成可读文本，并得到标题
@@ -142,7 +116,7 @@ def get_keywords():
     jieba.load_userdict("stock.txt")
     jieba.load_userdict("company.txt")
     jieba.load_userdict("psy.txt")
-    jieba.load_userdict("THUOCL_caijing")
+    jieba.load_userdict("THUOCL_caijing.txt")
     # 用于储存
     id_list = []
     word_list = []
@@ -152,7 +126,7 @@ def get_keywords():
     engine = create_engine(
         """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
         /dev1""")
-    sql = """select id,processed_text from xq_nlp"""
+    sql = """select id,processed_text from xq_value_processed_text"""
     # 得到文本的df
     rows = pd.read_sql(sql=sql, con=engine)
     # index是df的index  row是一行文本信息的list
@@ -183,47 +157,6 @@ def get_keywords():
     # print(df)
     # 数据库生成表, 如果已经存在就插入行
     df.to_sql('xq_keywords_1', engine, index=False, if_exists='append')
-
-
-# def get_keywords_fast():
-#     schema = 'public'
-#     id_list = []
-#     word_list = []
-#     type_list = []
-#     engine = create_engine(
-#         """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
-#         /dev1""")
-#     sql = """select id,processed_text from xq_value_processed_text"""
-#     rows = pd.read_sql(sql=sql, con=engine)
-#     for index, row in rows.iterrows():
-#         print(row[0])
-#         for w in anls.extract_tags(str(row[1]), 10, allowPOS='n'):
-#             id_list.append(row[0])
-#             word_list.append(w)
-#             type_list.append('n')
-#             # insert_keywords(row[0], w, 'n')
-#         print("done!n!")
-#         for w in anls.extract_tags(str(row[1]), 10, allowPOS='a'):
-#             id_list.append(row[0])
-#             word_list.append(w)
-#             type_list.append('a')
-#             # insert_keywords(row[0], w, 'a')
-#         print("done!a!")
-#     # commit
-#     # engine.commit()
-#
-#     df = pd.DataFrame({'id': id_list, 'word': word_list, 'type': type_list})
-#     print(df)
-#     output = StringIO()
-#     df.to_csv(output, sep='\t', index=False, header=False)
-#     output1 = output.getvalue()
-#     conn = psycopg2.connect(database="dev1", user="dev1_db", password="HdGY7MHZ6*v2",
-#                             host="pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com", port="1433")
-#     cur = conn.cursor()
-#     cur.copy_from(StringIO(output1), 'xq_keywords_copy1')
-#     conn.commit()
-#     cur.close()
-#     conn.close()
 
 
 def get_summary_snowNLP():
