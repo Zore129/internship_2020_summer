@@ -1,6 +1,5 @@
 # coding=utf-8
-"""使用时调用main(up,down) up为最大id down为最小id 程序补全其间的所有帖子
-若不加参数 则默认为更新爬取
+"""只用做日常更新
 """
 import re
 import time, json, requests
@@ -151,7 +150,7 @@ def log():
                         datefmt='%Y-%m-%d %H:%M:%S')
 
 
-def insert_value(up=0, down=0):
+def insert_value():
     # log file
     log()
     logging.info("running.")
@@ -199,24 +198,18 @@ def insert_value(up=0, down=0):
     table = "xq_values_demmmmo"
     df = pd.DataFrame()
 
-    up1 = up
-    down1 = down
+    up1 = get_latest_id(headers_raw, cookies)
+    down1 = get_max_id(table)
 
-    if up == 0:
-        up1 = get_latest_id(headers_raw, cookies)
-    if down == 0:
-        down1 = get_max_id(table)
-
-    if (not up1 == down1) and up == 0 and down == 0:
-        url = """https://xueqiu.com/v4/statuses/home_timeline.json?source=user"""
-        row = catch_data(url, headers_raw, cookies)
-        df = write_row(df, row)
+    # url = """https://xueqiu.com/v4/statuses/home_timeline.json?source=user"""
+    # rows = catch_data(url, headers_raw, cookies)
+    # df = write_row(df, rows[0])
 
     try:
         while up1 > down1:
             url = get_next_url(up1)
             rows = catch_data(url, headers_raw, cookies)
-            time.sleep(random.random()*3)
+            time.sleep(1+random.random() * 3)
             for row in rows:
                 if int(row['id']) > down1:
                     df = write_row(df, row)
@@ -224,7 +217,7 @@ def insert_value(up=0, down=0):
 
     except Exception:
         logging.error("ERROR!!!", exc_info=True)
-    print df
+    print(df)
     pd.io.sql.to_sql(df, table, engine, index=False, if_exists='append')
     print(' done')
     logging.info("finish.")
