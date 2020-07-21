@@ -1,7 +1,10 @@
 # coding=utf-8
 import json
+import logging
+import os
 import random
 import re
+import sys
 import time
 
 import pandas as pd
@@ -9,6 +12,12 @@ import psycopg2
 import requests
 from copyheaders import headers_raw_to_dict
 from sqlalchemy import create_engine
+
+
+def log():
+    filename_log = sys.argv[0][sys.argv[0].rfind(os.sep) + 1:] + ".log"
+    logging.basicConfig(filename=filename_log, level=logging.DEBUG, format='%(asctime)s %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
 
 def text_clean(text):
@@ -159,6 +168,9 @@ def get_uid():
 
 
 if __name__ == "__main__":
+    log()
+    logging.info("running.")
+    print("running.")
     engine = create_engine(
         """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
         /dev1""")
@@ -168,3 +180,5 @@ if __name__ == "__main__":
         df = get_bigv_statuses_data(row[0], df, timestamp=1595152799000)
     print(df)
     pd.io.sql.to_sql(df, 'xq_bigv_statuses', engine, index=False, if_exists='append')
+    logging.info("finish.")
+    print("finish.")
