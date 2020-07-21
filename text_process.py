@@ -11,7 +11,6 @@ from snownlp import SnowNLP
 from io import BytesIO as StringIO
 from sqlalchemy import create_engine
 
-reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
