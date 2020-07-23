@@ -105,29 +105,32 @@ def get_bigv_statuses_data(uid, df, timestamp):
     url = "https://xueqiu.com/v4/statuses/user_timeline.json?page=1&user_id={}".format(uid)
 
     headers_raw = b"""
-                Accept: */*
-                Accept-Encoding: gzip, deflate, br
-                Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
-                Connection: keep-alive
-                Host: xueqiu.com
-                Referer: https://xueqiu.com/u/6344107619
-                Sec-Fetch-Dest: empty
-                Sec-Fetch-Mode: cors
-                Sec-Fetch-Site: same-origin
-                User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36
-                """
+        Accept: application/json, text/plain, */*
+        Accept-Encoding: gzip, deflate, br
+        Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+        Connection: keep-alive
+        Host: xueqiu.com
+        elastic-apm-traceparent: 00-74c09c1b6de4171e7789dc2a4fcd8024-8cac70c8730a5f01-00
+        X-Requested-With: XMLHttpRequest
+        Origin: https://xueqiu.com
+        Sec-Fetch-Dest: empty
+        Sec-Fetch-Mode: cors
+        Sec-Fetch-Site: same-origin
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36
+        """
     headers = headers_raw_to_dict(headers_raw)
     cookies = {
-        'Cookie': 'device_id=24700f9f1986800ab4fcc880530dd0ed;'
-                  ' s=cj137q59ip;'
-                  ' __utmz=1.1592793568.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); '
-                  'bid=a14ed9b410aee955ba8ad6e90da6a7a1_kbpyznno; '
-                  '__utma=1.817981092.1592793568.1594089109.1594608858.9;'
-                  'aliyungf_tc=AQAAANG9cWmA3gIAxmMR2oZTY60bn1q/; '
-                  'snbim_minify=true; remember=1; xq_a_token=84f14d8d58bc742ddbdfb3443523553d63a8025b; '
+        'Cookie': 'device_id=24700f9f1986800ab4fcc880530dd0ed; s=cj137q59ip; __utmz=1.1592793568.1.1.utmcsr=('
+                  'direct)|utmccn=(direct)|utmcmd=(none); bid=a14ed9b410aee955ba8ad6e90da6a7a1_kbpyznno; '
+                  '__utma=1.817981092.1592793568.1594089109.1594608858.9; '
+                  'aliyungf_tc=AQAAAK+wG3yPCQwAxmMR2nQtRXxhCPrt; Hm_lvt_1db88642e346389874251b5a1eded6e3=1594972560,'
+                  '1594976484,1595211780,1595325323; snbim_minify=true; '
+                  'xq_a_token=915f95c7c9d7684c3e0b90134bcb3a682b5aa7d8; '
+                  'xqat=915f95c7c9d7684c3e0b90134bcb3a682b5aa7d8; '
+                  'xq_r_token=8fbff5480d8a5e5068ad26f2cde2e66b33e1c661; '
                   'xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9'
-                  '.eyJ1aWQiOjI3NjQ2MzUxNjIsImlzcyI6InVjIiwiZXhwIjoxNTk1MzkwNTM3LCJjdG0iOjE1OTQ5NTg2NDA2NjMsImNpZCI6ImQ5ZDBuNEFadXAifQ.Xy2Aie_k5diROfUqbs1CVmmXWG-U6HjiYvwX_edd5Ygensa5yPYcvp3WVgS8hqQ3jDcwwtVU6UTCwHGU0mIbNPfPEFzRk6SabKRhtfEblM2j0ldjlK54N5etVZ3MyDCaFphd_ylMnyVjrJJDEvN0PxPQ8UD4AJUuTu1J9ND6E4Y6fHkOt0c0JzQkCo8i7bcFU3ys6zRMM6tQNnpLuLGliqSDoA6fdHUj1lcBMr_VfhOnvemmhPM3v-hdT1rpY-sccTIT41IeBHhoDkpvLOOAwaxHOkldciAGdrnp7xta8OlwNZzbbZZaQma-4Hgbp2ZaPzp9G9dR6hIMTKqXnmczQQ; xqat=84f14d8d58bc742ddbdfb3443523553d63a8025b; xq_r_token=9b4d7ef924beea602bac78e7eb97363f6f5edbeb; xq_is_login=1; u=2764635162; Hm_lvt_1db88642e346389874251b5a1eded6e3=1594869365,1594881198,1594951757,1594968432; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1594968635; acw_tc=2760820e15949698335623055ecebfbe4c1c0be667f35eddd126a85454f9d2'}
-
+                  '.eyJ1aWQiOjcyOTU4Njg0MDMsImlzcyI6InVjIiwiZXhwIjoxNTk3ODkzODQ0LCJjdG0iOjE1OTUzMjYxMzM5ODAsImNpZCI6ImQ5ZDBuNEFadXAifQ.Bw7frr3jRZR3DGBk7jvhMeMXPCnCgUyhFcn8va4hVpeC6Thc0KSu8QSk1SATU4ZnMc14ailVgB2-jZ7FJ7EBZ0GCasEAq6R6OfFpSzeP4UspXhmncAGt2Zl9dtiCi5nZz5qXalkzfU3zmEwWy-6Agsy8diMooMNPgU5FYUYlN_b2T5ARZSnQTjldVOrfRZFkp9GcRyWY6cCjfnpJjo1hu7G471uZ8J08tBTLwogHSX4eYmIEXQunfCb7H7J4D2A4YqDljv_DGY3IyaTdmteERoM8tmgxgeEnPKRWNzn7lehlE0_bkI_GqReHExMCGHbnrTcnmDGPmg3Dr7o3ZHV0Zw; xq_is_login=1; u=7295868403; acw_tc=2760821815953271886532536e9869980c640fdf941b98fd28e81841c77a4b; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1595328040 '
+    }
     r = requests.get(url, headers=headers, cookies=cookies,
                      allow_redirects=False, timeout=None)
     # print(r.status_code)
@@ -144,27 +147,65 @@ def get_bigv_statuses_data(uid, df, timestamp):
             time.sleep(2 + random.random() * 3)
             # print(dic)
             for k in dic['statuses']:
-                if int(k['created_at']) < timestamp:
-                    print(int(k['created_at']))
-                    return df
-                df = write_row(df, k)
+                if k['mark'] == 1:
+                    if int(k['created_at']) > timestamp:
+                        df = write_row(df, k)
+                        print('write')
+                else:
+                    if int(k['created_at']) < timestamp:
+                        return df
+                    df = write_row(df, k)
+                    print('write')
 
             print(str(pagenum) + "____done")
         return df
 
 
-def get_uid():
-    conn = psycopg2.connect(database="dev1", user="dev1_db", password="HdGY7MHZ6*v2",
-                            host="pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com", port="1433")
-    print("Opened database successfully")
-    cur = conn.cursor()
-    sql = """SELECT uid FROM xq_bigv"""
-    cur.execute(sql)
-    rows = cur.fetchall()
-    # print rows
-    # notice the structure of list as below
-    # print(rows[0][0])
-    return rows
+def get_uid_from_web():
+    bigv_id_list = []
+    url = "https://xueqiu.com/friendships/groups/members.json?uid=7295868403&page=1&gid=0"
+
+    headers_raw = b"""
+        Accept: */*
+        Accept-Encoding: gzip, deflate, br
+        Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+        Connection: keep-alive
+        Host: xueqiu.com
+        elastic-apm-traceparent: 00-74c09c1b6de4171e7789dc2a4fcd8024-8cac70c8730a5f01-00
+        X-Requested-With: XMLHttpRequest
+        Origin: https://xueqiu.com
+        Referer: https://xueqiu.com/u/7295868403
+        Sec-Fetch-Dest: empty
+        Sec-Fetch-Mode: cors
+        Sec-Fetch-Site: same-origin
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36
+        """
+    headers = headers_raw_to_dict(headers_raw)
+    cookies = {
+        'Cookie': 'device_id=24700f9f1986800ab4fcc880530dd0ed; s=cj137q59ip; __utmz=1.1592793568.1.1.utmcsr=('
+                  'direct)|utmccn=(direct)|utmcmd=(none); bid=a14ed9b410aee955ba8ad6e90da6a7a1_kbpyznno; '
+                  '__utma=1.817981092.1592793568.1594089109.1594608858.9; '
+                  'aliyungf_tc=AQAAAMt/exjUOQwAxmMR2t/lmWrYwN42; Hm_lvt_1db88642e346389874251b5a1eded6e3=1594976484,'
+                  '1595211780,1595325323,1595383383; remember=1; xq_a_token=915f95c7c9d7684c3e0b90134bcb3a682b5aa7d8; '
+                  'xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9'
+                  '.eyJ1aWQiOjcyOTU4Njg0MDMsImlzcyI6InVjIiwiZXhwIjoxNTk3ODkzODQ0LCJjdG0iOjE1OTUzODM0MTYzOTYsImNpZCI6ImQ5ZDBuNEFadXAifQ.XFW5HfAuw-EoIv5234FgwXHVtkA4yRHR4xxZD1LQ-YyUs2dYpdWiGL_zsPQz1-a0v9jZ-bonP0RWBGPOvo2FlxbqTnzRKbOH_j1GppvHJlX81qbj0AEohtHE934W06bGOmOgSDE_oUD_4iJ7OL3wxvdcXYHwhKWKzkIkx4_rtNdqUAm9oD5JgBBRi_ihRvfBtqLBEILm9pwRcpn0QKK8L5pQ22Q2I3jgy7JjU81_zsDx4hVXhiOqRf5UE_3DH0C9HXRbNU1wbLiob_V30eWzphRB-gc6fTXh5xBhDzEhUk3F5Avg_L71df8TzsDyiHt1HIpCh7n-GMmrEnuEUPmm6g; xqat=915f95c7c9d7684c3e0b90134bcb3a682b5aa7d8; xq_r_token=8fbff5480d8a5e5068ad26f2cde2e66b33e1c661; xq_is_login=1; u=7295868403; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1595385044; acw_tc=2760820015953853892928326e46bd1043c8a4ae0fc4d130a08b4cbe3f0a6b'}
+    r = requests.get(url, headers=headers, cookies=cookies,
+                     allow_redirects=False, timeout=None)
+    dictstr = json.loads(r.text)
+    maxPage = dictstr['maxPage']
+    print(maxPage)
+    for pagenum in range(maxPage):
+        url = "https://xueqiu.com/friendships/groups/members.json?uid=7295868403&page={}&gid=0".format(pagenum + 1)
+        print(url)
+        r = requests.get(url, headers=headers, cookies=cookies,
+                         allow_redirects=False, timeout=None)
+        dic = json.loads(r.text)
+        time.sleep(1 + random.random() * 3)
+        # print(dic)
+        for k in dic['users']:
+            bigv_id_list.append(k['id'])
+        print(str(pagenum) + "____done")
+    return bigv_id_list
 
 
 if __name__ == "__main__":
@@ -173,12 +214,12 @@ if __name__ == "__main__":
     print("running.")
     engine = create_engine(
         """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
-        /dev1""")
+        /demo""")
     df = pd.DataFrame()
-    for row in get_uid():
-        print(df)
-        df = get_bigv_statuses_data(row[0], df, timestamp=1595152799000)
+    for row in get_uid_from_web():
+        print(row)
+        df = get_bigv_statuses_data(row, df, timestamp=1595297505000)
     print(df)
-    pd.io.sql.to_sql(df, 'xq_bigv_statuses', engine, index=False, if_exists='append')
+    pd.io.sql.to_sql(df, 'xq_bigv_statuses', engine, schema='xueqiu',index=False, if_exists='append')
     logging.info("finish.")
     print("finish.")
