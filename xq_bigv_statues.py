@@ -95,6 +95,7 @@ def write_row(df, row):
         value_dict['title'] = text_clean(value_dict['text'])[0]
 
     df_line = pd.DataFrame(value_dict, index=[0])
+    print(df_line)
     df = df.append(df_line, ignore_index=True)
 
     return df
@@ -215,11 +216,11 @@ if __name__ == "__main__":
     engine = create_engine(
         """postgresql+psycopg2://dev1_db:HdGY7MHZ6*v2@pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com:1433
         /demo""")
-    df = pd.DataFrame()
     for row in get_uid_from_web():
+        df = pd.DataFrame()
         print(row)
-        df = get_bigv_statuses_data(row, df, timestamp=1595297505000)
-    print(df)
-    pd.io.sql.to_sql(df, 'xq_bigv_statuses', engine, schema='xueqiu',index=False, if_exists='append')
+        df = get_bigv_statuses_data(row, df, timestamp=1577808000000)
+        pd.io.sql.to_sql(df, 'xq_bigv_statuses_test', engine, schema='xueqiu', index=False, if_exists='append')
+    # pd.io.sql.to_sql(df, 'xq_bigv_statuses_test', engine, schema='xueqiu',index=False, if_exists='append')
     logging.info("finish.")
     print("finish.")
