@@ -37,9 +37,10 @@ def text_clean(text):
 
 
 def get_max_id(table_name):
-    conn = psycopg2.connect(database="dev1", user="dev1_db", password="HdGY7MHZ6*v2",
+    conn = psycopg2.connect(database="demo", user="dev1_db", password="HdGY7MHZ6*v2",
                             host="pgm-8vb23fi81368zq03lo.pgsql.zhangbei.rds.aliyuncs.com", port="1433")
     cur = conn.cursor()
+    cur.execute("""set search_path to xueqiu""")
     sql = """SELECT MAX(id) FROM {}""".format(table_name)
     cur.execute(sql)
     max_id = cur.fetchone()
@@ -160,42 +161,40 @@ def insert_value():
     url = "https://xueqiu.com/v4/statuses/home_timeline.json?source=user"
 
     headers_raw = b"""
-        Accept: application/json, text/plain, */*
+        Accept: */*
         Accept-Encoding: gzip, deflate, br
         Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
         Connection: keep-alive
         Host: xueqiu.com
-        Referer: https://xueqiu.com/u/6344107619
+        elastic-apm-traceparent: 00-74c09c1b6de4171e7789dc2a4fcd8024-8cac70c8730a5f01-00
+        X-Requested-With: XMLHttpRequest
+        Origin: https://xueqiu.com
+        Referer: https://xueqiu.com/u/7295868403
         Sec-Fetch-Dest: empty
         Sec-Fetch-Mode: cors
         Sec-Fetch-Site: same-origin
-        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36
         """
-
     cookies = {
-        'Cookie': 'aliyungf_tc=AQAAAJ4kVxrOCwgAxmMR2pr3vgx12DhM; snbim_minify=true; '
-                  'device_id=24700f9f1986800ab4fcc880530dd0ed; Hm_lvt_1db88642e346389874251b5a1eded6e3=1592793404; '
-                  's=cj137q59ip; __utmc=1; __utmz=1.1592793568.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); '
-                  'remember=1; '
-                  'xq_is_login=1; u=2764635162; bid=a14ed9b410aee955ba8ad6e90da6a7a1_kbpyznno; '
-                  'captcha_id=QwFaqtJ13sksgsp9RatEnEOgh7qJXn; xq_a_token=84f14d8d58bc742ddbdfb3443523553d63a8025b; '
-                  'xqat=84f14d8d58bc742ddbdfb3443523553d63a8025b; xq_r_token=9b4d7ef924beea602bac78e7eb97363f6f5edbeb; '
+        'Cookie': 'device_id=24700f9f1986800ab4fcc880530dd0ed; s=cj137q59ip; __utmz=1.1592793568.1.1.utmcsr=('
+                  'direct)|utmccn=(direct)|utmcmd=(none); bid=a14ed9b410aee955ba8ad6e90da6a7a1_kbpyznno; '
+                  '__utma=1.817981092.1592793568.1594089109.1594608858.9; '
+                  'aliyungf_tc=AQAAAMt/exjUOQwAxmMR2t/lmWrYwN42; Hm_lvt_1db88642e346389874251b5a1eded6e3=1594976484,'
+                  '1595211780,1595325323,1595383383; remember=1; xq_a_token=915f95c7c9d7684c3e0b90134bcb3a682b5aa7d8; '
                   'xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9'
-                  '.eyJ1aWQiOjI3NjQ2MzUxNjIsImlzcyI6InVjIiwiZXhwIjoxNTk1MzkwNTM3LCJjdG0iOjE1OTI3OTg1MzcyNjQsImNpZCI6ImQ5ZDBuNEFadXAifQ.kVnwLdzuHrBpSuRQczcC13mNjqKGx6yUtnisXKaKcrrz_VNcFuZEAo7MlMBCDydipOJYmcVy2n45r3uoefagrOqPEAvHCBVjzjMNPZiALu42wbbfN9zrG7DsOAVnd8zlHidZLf0E7dNP1w_RtTKP7KY8nAcUFNWLYawTnGc3D75v7vW4nE2orUlFNPzm1DAaXeGG7e2LrNzgTWktIydCD_wxRvPuDd7ABF54xJKE-jljK0cAPriyvqztE09JvBW_Q7xvQm2sxnpr19xzWrU01tTPW4fEEKfw1xYSJnS3ePqF2X5GdJ1TzJHJXesUPoF6nYOdwLqDrDhSlJpyId_AKg; __utma=1.817981092.1592793568.1592798313.1592807818.3; acw_tc=2760825415928125915283497ecb0589c794e8b03b21c83f2bf712a19fe0a2; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1592812751 '
-
-    }
+                  '.eyJ1aWQiOjcyOTU4Njg0MDMsImlzcyI6InVjIiwiZXhwIjoxNTk3ODkzODQ0LCJjdG0iOjE1OTUzODM0MTYzOTYsImNpZCI6ImQ5ZDBuNEFadXAifQ.XFW5HfAuw-EoIv5234FgwXHVtkA4yRHR4xxZD1LQ-YyUs2dYpdWiGL_zsPQz1-a0v9jZ-bonP0RWBGPOvo2FlxbqTnzRKbOH_j1GppvHJlX81qbj0AEohtHE934W06bGOmOgSDE_oUD_4iJ7OL3wxvdcXYHwhKWKzkIkx4_rtNdqUAm9oD5JgBBRi_ihRvfBtqLBEILm9pwRcpn0QKK8L5pQ22Q2I3jgy7JjU81_zsDx4hVXhiOqRf5UE_3DH0C9HXRbNU1wbLiob_V30eWzphRB-gc6fTXh5xBhDzEhUk3F5Avg_L71df8TzsDyiHt1HIpCh7n-GMmrEnuEUPmm6g; xqat=915f95c7c9d7684c3e0b90134bcb3a682b5aa7d8; xq_r_token=8fbff5480d8a5e5068ad26f2cde2e66b33e1c661; xq_is_login=1; u=7295868403; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1595385044; acw_tc=2760820015953853892928326e46bd1043c8a4ae0fc4d130a08b4cbe3f0a6b'}
 
     # database variable
     user = "dev1_db"
     password = "HdGY7MHZ6*v2"
     host = "pgm-8vb23fi81368zq0357540.pgsql.zhangbei.rds.aliyuncs.com:1433"
-    db = "dev1"
-    schema = 'public'
+    db = "demo"
+    schema = 'xueqiu'
     engine = create_engine("postgresql+psycopg2://%s:%s@%s/%s" % (
         user, password, host, db))
 
     # table variable!!!
-    table = "xq_values_demmmmo"
+    table = "xq_bigv_statuses"
     df = pd.DataFrame()
 
     up1 = get_latest_id(headers_raw, cookies)
@@ -209,7 +208,7 @@ def insert_value():
         while up1 > down1:
             url = get_next_url(up1)
             rows = catch_data(url, headers_raw, cookies)
-            time.sleep(1+random.random() * 3)
+            time.sleep(1 + random.random() * 3)
             for row in rows:
                 if int(row['id']) > down1:
                     df = write_row(df, row)
@@ -218,7 +217,7 @@ def insert_value():
     except Exception:
         logging.error("ERROR!!!", exc_info=True)
     print(df)
-    pd.io.sql.to_sql(df, table, engine, index=False, if_exists='append')
+    pd.io.sql.to_sql(df, table, engine, schema=schema, index=False, if_exists='append')
     print(' done')
     logging.info("finish.")
     print("finish.")
