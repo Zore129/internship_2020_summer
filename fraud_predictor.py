@@ -23,7 +23,7 @@ def read():
     for index, row in df.iterrows():
         yrs = row['ViolationYear'].split(',')
         vids = row['ViolationTypeID'].split(',')
-        print yrs, vids
+        print(yrs, vids)
         for y in yrs:
             for v in vids:
                 v_ID_list.append(row['ViolationID'])
