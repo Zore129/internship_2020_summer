@@ -91,9 +91,10 @@ def write_row(df, row):
     value_dict["retweeted_status_stockCorrelation"] = stocklist_1
 
     value_dict['processed_text'] = text_clean(value_dict['text'])[1]
+    value_dict['is_article'] = 0
     if not value_dict['title']:
         value_dict['title'] = text_clean(value_dict['text'])[0]
-
+        value_dict['is_article'] = 1
     df_line = pd.DataFrame(value_dict, index=[0])
     print(df_line)
     df = df.append(df_line, ignore_index=True)
