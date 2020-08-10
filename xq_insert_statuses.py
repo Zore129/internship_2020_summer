@@ -23,14 +23,13 @@ import os
 
 def text_clean(text):
     # 去掉空行
-    text0 = text.replace('</p><p>&nbsp;', '')
-    text00 = text0.replace('</b></p><p><b>&nbsp;', '')
-    # </p><p>代表要换行 插入换行转义符
-    text1 = text00.replace('</p><p>', '</p> ' + chr(10) + '<p>')
+    text1 = text.replace('</p><p>', '</p> ' + chr(10) + '<p>') \
+        .replace('</p> <p>', '</p> ' + chr(10) + '<p>').replace('<br/>', chr(10))
+    text2 = text1.replace('&nbsp;', ' ').replace('&quot;', '"').replace('&amp;', '&').replace('&#34;', '"')
     # 生成正则编译器，用于删除括号中的内容
     dr = re.compile(r'<[^>]+>', re.S)
     # 用正则编译器删去括号内容，删去空格符号，得到处理过后的文字
-    processed_data = dr.sub('', text1).replace('&nbsp;', '')
+    processed_data = dr.sub('', text2)
     # 取前30个字符为标题
     title = processed_data[0:30]
     return title, processed_data
@@ -136,9 +135,10 @@ def write_row(df, row):
     value_dict["retweeted_status_stockCorrelation"] = stocklist_1
 
     value_dict['processed_text'] = text_clean(value_dict['text'])[1]
+    value_dict['is_article'] = 1
     if not value_dict['title']:
         value_dict['title'] = text_clean(value_dict['text'])[0]
-
+        value_dict['is_article'] = 0
     df_line = pd.DataFrame(value_dict, index=[0])
     df = df.append(df_line, ignore_index=True)
 

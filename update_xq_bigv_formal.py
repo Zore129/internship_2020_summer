@@ -128,13 +128,13 @@ def insert_bigv_data(userinfo):
     cur.execute("""set search_path to xueqiu""")
     sql = """insert into xq_bigv(province, city, gender, friends_count, stocks_count, description, status_count, 
     verified_description, verified_type, screen_name, verified, followers_count, donate_count,"maxPage", created_at, 
-    updated_at, uid)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(),NOW(), %s) """
+    updated_at, uid, batch)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(),NOW(), %s, %s) """
     params = (
         userinfo['province'], userinfo['city'], userinfo['gender'], userinfo['friends_count'], userinfo['stocks_count'],
         userinfo['description'], userinfo['status_count'], userinfo['verified_description'], userinfo['verified_type'],
         userinfo['screen_name'], userinfo['verified'], userinfo['followers_count'], userinfo['donate_count'],
-        userinfo['maxPage'], str(userinfo['uid']),)
+        userinfo['maxPage'], str(userinfo['uid']), 2)
     # print(params)
     cur.execute(sql, params, )
     # commit
